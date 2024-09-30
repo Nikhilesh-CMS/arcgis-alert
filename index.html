@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcGIS Alert</title>
+</head>
+<body>
+  <h1>ArcGIS Audio Alert</h1>
+  <p>This page will trigger an audio alert when "Increased" is detected in your hosted feature layer.</p>
+  
+  <!-- Embed an audio element -->
+  <audio id="alert-sound" src="https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/pause.wav" preload="auto"></audio>
+  
+  <script>
+    // Function to play the alert sound
+    function playAlertSound() {
+      var alertSound = document.getElementById('alert-sound');
+      alertSound.play();
+
+      // Stop the sound after 1 minute
+      setTimeout(function() {
+        alertSound.pause();
+        alertSound.currentTime = 0; // Reset the audio to the start
+      }, 60000); // 1 minute in milliseconds
+    }
+
+    // Function to check the hosted feature layer
+    function checkFeatureLayer() {
+      // ArcGIS REST API query to your hosted feature layer
+      var url = "https://services-ap1.arcgis.com/Q6vQfsr0oYrwKWlE/arcgis/rest/services/Bengaluru_Wards_C19_Change/FeatureServer/0/query?where=Result='Increased'&outFields=Result&f=json";
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.features && data.features.length > 0) {
+            // If there is at least one feature with Result = "Increased"
+            playAlertSound();
+          }
+        })
+        .catch(error => {
+          console.error("Error querying the feature layer:", error);
+        });
+    }
+
+    // Call the check function every 10 seconds (adjust as needed)
+    setInterval(checkFeatureLayer, 10000);
+  </script>
+</body>
+</html>
